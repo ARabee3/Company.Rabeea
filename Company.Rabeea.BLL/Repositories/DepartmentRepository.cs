@@ -13,9 +13,9 @@ namespace Company.Rabeea.BLL.Repositories
     public class DepartmentRepository : IDepartmentRepository
     {
         private readonly CompanyDbContext _context;
-        public DepartmentRepository()
+        public DepartmentRepository(CompanyDbContext companyDbContext)
         {
-            _context = new CompanyDbContext();
+            _context = companyDbContext;
         }
         public IEnumerable<Department> GetAll()
         {

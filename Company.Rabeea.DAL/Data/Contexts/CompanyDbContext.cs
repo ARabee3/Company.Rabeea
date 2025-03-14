@@ -6,7 +6,7 @@ namespace Company.Rabeea.DAL.Data.Contexts
 {
     public class CompanyDbContext : DbContext
     {
-        public CompanyDbContext() : base()
+        public CompanyDbContext(DbContextOptions options) : base(options)
         {
             
         }
@@ -16,10 +16,10 @@ namespace Company.Rabeea.DAL.Data.Contexts
             base.OnModelCreating(modelBuilder);
         }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlServer("Server = Rabee3; Database = CompanyMVCProject; TrustServerCertificate = True; Trusted_Connection = True");
-        }
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //{
+        //    optionsBuilder.UseSqlServer("Server = Rabee3; Database = CompanyMVCProject; TrustServerCertificate = True; Trusted_Connection = True");
+        //}
         public DbSet<Department> Departments { get; set; }
     }
 }

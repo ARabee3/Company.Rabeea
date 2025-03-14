@@ -1,3 +1,9 @@
+using Company.Rabeea.BLL.Interfaces;
+using Company.Rabeea.BLL.Repositories;
+using Company.Rabeea.DAL.Data.Contexts;
+using Company.Rabeea.DAL.Models;
+using Microsoft.EntityFrameworkCore;
+
 namespace Company.Rabeea.PL
 {
     public class Program
@@ -7,7 +13,12 @@ namespace Company.Rabeea.PL
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-            builder.Services.AddControllersWithViews(); 
+            builder.Services.AddControllersWithViews();
+            builder.Services.AddScoped<IDepartmentRepository,DepartmentRepository>(); // Allows DI for DepartmentRepository
+            builder.Services.AddDbContext<CompanyDbContext>(options =>
+            {
+                options.UseSqlServer(builder.Configuration.GetConnectionString("Default"));
+            } ); // Allows DI for DbContext
 
             var app = builder.Build();
 
