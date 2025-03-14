@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace Company.Rabeea.DAL.Data.Contexts
 {
-    class CompanyDbContext : DbContext
+    public class CompanyDbContext : DbContext
     {
         public CompanyDbContext() : base()
         {
