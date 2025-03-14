@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Company.Rabeea.DAL\Company.Rabeea.DAL.csproj" />
+  </ItemGroup>
+
 </Project>
