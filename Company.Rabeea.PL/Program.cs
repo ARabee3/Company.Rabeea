@@ -14,11 +14,11 @@ namespace Company.Rabeea.PL
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
-            builder.Services.AddScoped<IDepartmentRepository,DepartmentRepository>(); // Allows DI for DepartmentRepository
+            builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>(); // Allows DI for DepartmentRepository
             builder.Services.AddDbContext<CompanyDbContext>(options =>
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("Default"));
-            } ); // Allows DI for DbContext
+            }); // Allows DI for DbContext
 
             var app = builder.Build();
 
@@ -40,6 +40,7 @@ namespace Company.Rabeea.PL
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
+           
 
             app.Run();
         }

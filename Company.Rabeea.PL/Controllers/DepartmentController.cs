@@ -3,6 +3,7 @@ using Company.Rabeea.BLL.Repositories;
 using Company.Rabeea.DAL.Models;
 using Company.Rabeea.PL.Dto;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Specialized;
 using System.ComponentModel;
 
 namespace Company.Rabeea.PL.Controllers
@@ -25,6 +26,7 @@ namespace Company.Rabeea.PL.Controllers
         {
             return View();
         }
+        [HttpPost]
         public IActionResult Create(CreateDepartmentDto department)
         {
             if (ModelState.IsValid) // Server Side Validaton
@@ -43,6 +45,34 @@ namespace Company.Rabeea.PL.Controllers
             }
             return View(department);
         }
-       
+
+        [HttpGet]
+        public IActionResult Details(int? id)
+        {
+            if (id is null) return BadRequest();
+            var dept = _departmentRepository.Get(id.Value);
+            if(dept is null)
+            {
+                return NotFound();
+            }
+            return View(dept);
+        }
+        [HttpGet]
+        public IActionResult Edit(int? id)
+        {
+            if (id is null) return BadRequest();
+            var dept = _departmentRepository.Get(id.Value);
+            if (dept is null)
+            {
+                return NotFound();
+            }
+            return View(dept);
+        }
+        public IActionResult Edit(Department dept)
+        {
+            var count = _departmentRepository.Update(dept);
+            if (count > 0) RedirectToAction("Index");
+            return View(dept);
+        }
     }
 }
