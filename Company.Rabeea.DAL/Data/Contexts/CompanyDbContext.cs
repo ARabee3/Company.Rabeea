@@ -21,5 +21,6 @@ namespace Company.Rabeea.DAL.Data.Contexts
         //    optionsBuilder.UseSqlServer("Server = Rabee3; Database = CompanyMVCProject; TrustServerCertificate = True; Trusted_Connection = True");
         //}
         public DbSet<Department> Departments { get; set; }
+        public DbSet<Employee> Employees { get; set; }
     }
 }
