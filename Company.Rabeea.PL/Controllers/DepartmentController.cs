@@ -47,7 +47,7 @@ namespace Company.Rabeea.PL.Controllers
         }
 
         [HttpGet]
-        public IActionResult Details(int? id)
+        public IActionResult Details(int? id, string viewName = "Details")
         {
             if (id is null) return BadRequest();
             var dept = _departmentRepository.Get(id.Value);
@@ -55,10 +55,33 @@ namespace Company.Rabeea.PL.Controllers
             {
                 return NotFound();
             }
-            return View(dept);
+            return View(viewName,dept);
         }
         [HttpGet]
         public IActionResult Edit(int? id)
+        {
+            //if (id is null) return BadRequest();
+            //var dept = _departmentRepository.Get(id.Value);
+            //if (dept is null)
+            //{
+            //    return NotFound();
+            //}
+            return Details(id,"Edit");
+        }
+        [HttpPost]
+        //[ValidateAntiForgeryToken] allows only the app to use the POST Endpoint
+        public IActionResult Edit([FromRoute]int id,Department dept)
+        {
+            if (id != dept.Id) return BadRequest();
+            if (ModelState.IsValid)
+            {
+                var count = _departmentRepository.Update(dept);
+                if (count > 0) return RedirectToAction("Index");
+            }
+            
+            return View(dept);
+        }
+        public IActionResult Delete(int? id)
         {
             if (id is null) return BadRequest();
             var dept = _departmentRepository.Get(id.Value);
@@ -66,13 +89,10 @@ namespace Company.Rabeea.PL.Controllers
             {
                 return NotFound();
             }
-            return View(dept);
+            _departmentRepository.Delete(dept);
+            return RedirectToAction(nameof(Index));
+
         }
-        public IActionResult Edit(Department dept)
-        {
-            var count = _departmentRepository.Update(dept);
-            if (count > 0) RedirectToAction("Index");
-            return View(dept);
-        }
+
     }
 }
