@@ -13,9 +13,14 @@ namespace Company.Rabeea.PL.Controllers
             _departmentRepository = departmentRepository;
         }
         public IActionResult Index()
-        { 
+        {
             var departments = _departmentRepository.GetAll();
             return View(departments);
+        }
+        [HttpGet]
+        public IActionResult Create()
+        {
+            return View();
         }
     }
 }
