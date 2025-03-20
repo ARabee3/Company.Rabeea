@@ -3,8 +3,6 @@ using Company.Rabeea.BLL.Repositories;
 using Company.Rabeea.DAL.Models;
 using Company.Rabeea.PL.Dto;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Specialized;
-using System.ComponentModel;
 
 namespace Company.Rabeea.PL.Controllers
 {
@@ -60,26 +58,39 @@ namespace Company.Rabeea.PL.Controllers
         [HttpGet]
         public IActionResult Edit(int? id)
         {
-            //if (id is null) return BadRequest();
-            //var dept = _departmentRepository.Get(id.Value);
-            //if (dept is null)
-            //{
-            //    return NotFound();
-            //}
-            return Details(id,"Edit");
+            if (id is null) return BadRequest();
+            var dept = _departmentRepository.Get(id.Value);
+            if (dept is null)
+            {
+                return NotFound();
+            }
+            var department = new CreateDepartmentDto
+            {
+                Code = dept.Code,
+                Name = dept.Name,
+                CreateAt = dept.CreateAt
+            };
+            return View(department);
         }
         [HttpPost]
         //[ValidateAntiForgeryToken] allows only the app to use the POST Endpoint
-        public IActionResult Edit([FromRoute]int id,Department dept)
-        {
-            if (id != dept.Id) return BadRequest();
+        public IActionResult Edit([FromRoute]int id,CreateDepartmentDto department)
+        { 
             if (ModelState.IsValid)
             {
+                var dept = new Department()
+                {
+                    Id = id,
+                    Code = department.Code,
+                    Name = department.Name,
+                    CreateAt = department.CreateAt
+                };
+                if (id != dept.Id) return BadRequest();
                 var count = _departmentRepository.Update(dept);
                 if (count > 0) return RedirectToAction("Index");
             }
             
-            return View(dept);
+            return View(department);
         }
         public IActionResult Delete(int? id)
         {
