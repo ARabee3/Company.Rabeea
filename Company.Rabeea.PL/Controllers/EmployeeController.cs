@@ -1,10 +1,7 @@
 ﻿using Company.Rabeea.BLL.Interfaces;
-using Company.Rabeea.BLL.Repositories;
 using Company.Rabeea.DAL.Models;
 using Company.Rabeea.PL.Dto;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Server.IISIntegration;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
 
 namespace Company.Rabeea.PL.Controllers
 {
@@ -66,16 +63,47 @@ namespace Company.Rabeea.PL.Controllers
         [HttpGet]
         public IActionResult Edit(int? id)
         {
-            return Details(id, "Edit");
+            if (id is null) return BadRequest();
+            var employee = _employeeRepository.Get(id.Value);
+            if (employee is null)
+            {
+                return NotFound();
+            }
+            var emp = new CreateEmployeeDto()
+            {
+                Name = employee.Name,
+                Address = employee.Address,
+                Age = employee.Age,
+                Email = employee.Email,
+                CreateAt = employee.CreateAt,
+                HiringDate = employee.HiringDate,
+                IsActive = true,
+                Phone = employee.Phone,
+                Salary = employee.Salary
+            };
+            return View(emp);
         }
 
         [HttpPost]
-        public IActionResult Edit([FromRoute] int id, Employee employee)
+        public IActionResult Edit([FromRoute] int id, CreateEmployeeDto employee)
         {
             if (ModelState.IsValid)
             {
-                if (id != employee.Id) return BadRequest();
-                var count = _employeeRepository.Update(employee);
+                var emp = new Employee()
+                {
+                    Id = id,
+                    Name = employee.Name,
+                    Address = employee.Address,
+                    Age = employee.Age,
+                    Email = employee.Email,
+                    CreateAt = employee.CreateAt,
+                    HiringDate = employee.HiringDate,
+                    IsActive = true,
+                    Phone = employee.Phone,
+                    Salary = employee.Salary
+                };
+                if (id != emp.Id) return BadRequest();
+                var count = _employeeRepository.Update(emp);
                 if (count > 0) return RedirectToAction(nameof(Index));
             }
             return View(employee);
