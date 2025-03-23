@@ -27,8 +27,8 @@ namespace Company.Rabeea.PL.Controllers
         [HttpPost]
         public IActionResult Create(CreateEmployeeDto employee)
         {
-           
-            if (ModelState.IsValid) 
+
+            if (ModelState.IsValid)
             {
                 var emp = new Employee()
                 {
@@ -43,7 +43,12 @@ namespace Company.Rabeea.PL.Controllers
                     Salary = employee.Salary
                 };
                 var count = _employeeRepository.Add(emp);
-                if (count > 0) return RedirectToAction(nameof(Index));   
+                if (count > 0)
+                {
+                    TempData["Message"] = "Employee Created Successfully";
+                    return RedirectToAction(nameof(Index));
+
+                } 
             }
             return View(employee);
         }
