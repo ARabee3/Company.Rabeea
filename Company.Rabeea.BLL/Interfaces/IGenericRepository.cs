@@ -9,5 +9,6 @@ namespace Company.Rabeea.BLL.Interfaces
         int Add(T model);
         int Update(T model);
         int Delete(T model);
+
     }
 }

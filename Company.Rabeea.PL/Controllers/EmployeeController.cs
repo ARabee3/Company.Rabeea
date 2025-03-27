@@ -8,20 +8,32 @@ namespace Company.Rabeea.PL.Controllers
     public class EmployeeController : Controller
     {
         private readonly IEmployeeRepository _employeeRepository;
+        private readonly IDepartmentRepository _departmentRepository;
 
-        public EmployeeController(IEmployeeRepository employeeRepository)
+        public EmployeeController(IEmployeeRepository employeeRepository, IDepartmentRepository departmentRepository)
         {
             this._employeeRepository = employeeRepository;
+            this._departmentRepository = departmentRepository;
         }
         [HttpGet]
-        public IActionResult Index()
+        public IActionResult Index(string SearchInput)
         {
-            var employees = _employeeRepository.GetAll();
+            IEnumerable<Employee> employees;
+            if(SearchInput is not null)
+            {
+                employees = _employeeRepository.GetByName(SearchInput);
+            }
+            else
+            {
+                employees = _employeeRepository.GetAll();
+            }
             return View(employees);
         }
         [HttpGet]
         public IActionResult Create()
         {
+            var departments = _departmentRepository.GetAll();
+            ViewData["departments"] = departments;
             return View();
         }
         [HttpPost]
@@ -40,7 +52,8 @@ namespace Company.Rabeea.PL.Controllers
                     HiringDate = employee.HiringDate,
                     IsActive = true,
                     Phone = employee.Phone,
-                    Salary = employee.Salary
+                    Salary = employee.Salary,
+                    DepartmentId = employee.DepartmentId
                 };
                 var count = _employeeRepository.Add(emp);
                 if (count > 0)
@@ -68,6 +81,8 @@ namespace Company.Rabeea.PL.Controllers
         [HttpGet]
         public IActionResult Edit(int? id)
         {
+            var departments = _departmentRepository.GetAll();
+            ViewData["departments"] = departments;
             if (id is null) return BadRequest();
             var employee = _employeeRepository.Get(id.Value);
             if (employee is null)
@@ -84,7 +99,8 @@ namespace Company.Rabeea.PL.Controllers
                 HiringDate = employee.HiringDate,
                 IsActive = true,
                 Phone = employee.Phone,
-                Salary = employee.Salary
+                Salary = employee.Salary,
+                DepartmentId = employee.DepartmentId
             };
             return View(emp);
         }
@@ -92,6 +108,8 @@ namespace Company.Rabeea.PL.Controllers
         [HttpPost]
         public IActionResult Edit([FromRoute] int id, CreateEmployeeDto employee)
         {
+            var departments = _departmentRepository.GetAll();
+            ViewData["departments"] = departments;
             if (ModelState.IsValid)
             {
                 var emp = new Employee()
@@ -105,7 +123,8 @@ namespace Company.Rabeea.PL.Controllers
                     HiringDate = employee.HiringDate,
                     IsActive = true,
                     Phone = employee.Phone,
-                    Salary = employee.Salary
+                    Salary = employee.Salary,
+                    DepartmentId = employee.DepartmentId
                 };
                 if (id != emp.Id) return BadRequest();
                 var count = _employeeRepository.Update(emp);

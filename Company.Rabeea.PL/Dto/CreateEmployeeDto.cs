@@ -40,6 +40,8 @@ public class CreateEmployeeDto
     public DateTime HiringDate { get; set; }
     [Required(ErrorMessage = "CreateAt is Required!")]
     [DisplayName("Date Of Creation")]
-
     public DateTime CreateAt { get; set; }
+
+    [DisplayName("Department")]
+    public int? DepartmentId { get; set; }
 }
