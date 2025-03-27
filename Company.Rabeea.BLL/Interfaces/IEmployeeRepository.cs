@@ -9,5 +9,6 @@ namespace Company.Rabeea.BLL.Interfaces
         //int Add(Employee department);
         //int Update(Employee department);
         //int Delete(Employee department);
+        public IEnumerable<Employee> GetByName(string input);
     }
 }

@@ -7,6 +7,19 @@
 
 <br />
 <br />
+
+<form>
+    <div class="container m-4">
+        <div class="row justify-content-center">
+            <div class="col-6">
+                <input placeholder="Search By Name" name="SearchInput" class="form-control"/>
+            </div>
+            <div class="col-6">
+                <input type="submit" class="btn btn-success" value="Search" />
+            </div>
+        </div>
+    </div>
+</form>
 <a asp-action="Create" asp-controller="Employee" class="btn btn-primary">Create Employee</a>
 @if (!string.IsNullOrEmpty(TempData["Message"] as string))
 {
@@ -25,6 +38,7 @@
                 <th>Salary</th>
                 <th>Email</th>
                 <th>@Html.DisplayNameFor(e => e.HiringDate)</th>
+                <th>Department</th>
                 <th>Details</th>
                 <th>Update</th>
                 <th>Delete</th>
@@ -37,17 +51,28 @@
                 {
                     <tr>
                         <td>
-                        @item.Name
-                    </td>
-                    <td>
-                        @Html.DisplayFor(m => item.Salary)
-                    </td>
-                    <td>
-                        @item.Email
-                    </td> 
-                    <td>
-                        @item.HiringDate.ToShortDateString()
-                    </td>
+                            @item.Name
+                        </td>
+                        <td>
+                            @Html.DisplayFor(m => item.Salary)
+                        </td>
+                        <td>
+                            @item.Email
+                        </td> 
+                        <td>
+                            @item.HiringDate.ToShortDateString()
+                        </td>
+                        
+                            @if(item.Department is null)
+                            {
+                                <td>
+                                    No Department
+                                </td>
+                            }
+                            else
+                            {
+                                <td>@item.Department.Name</td>
+                            }
                     <partial name="_ButtonPartialView" model="@item.Id"/>
                 </tr>
                 }
