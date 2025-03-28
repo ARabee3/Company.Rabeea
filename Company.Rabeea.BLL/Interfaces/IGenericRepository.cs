@@ -6,9 +6,9 @@ namespace Company.Rabeea.BLL.Interfaces
     {
         public IEnumerable<T> GetAll();
         T? Get(int id);
-        int Add(T model);
-        int Update(T model);
-        int Delete(T model);
+        void Add(T model);
+        void Update(T model);
+        void Delete(T model);
 
     }
 }

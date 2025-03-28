@@ -4,26 +4,24 @@ using Company.Rabeea.BLL.Repositories;
 using Company.Rabeea.DAL.Models;
 using Company.Rabeea.PL.Dto;
 using Microsoft.AspNetCore.Mvc;
-
 namespace Company.Rabeea.PL.Controllers
 {
     public class DepartmentController : Controller
     {
         // Ask CLR To Create Object of DepartmentRepository
-        private readonly IDepartmentRepository _departmentRepository;
         private readonly IMapper _mapper;
-
+        private readonly IUnitOfWork _unitOfWork;
         public DepartmentController(
-            IDepartmentRepository departmentRepository,
-            IMapper mapper
+            IMapper mapper,
+            IUnitOfWork unitOfWork
             )
         {
-            _departmentRepository = departmentRepository;
-            this._mapper = mapper;
+            _mapper = mapper;
+            _unitOfWork = unitOfWork;
         }
         public IActionResult Index()
         {
-            var departments = _departmentRepository.GetAll();
+            var departments = _unitOfWork.DepartmentRepository.GetAll();
             return View(departments);
         }
         [HttpGet]
@@ -37,7 +35,8 @@ namespace Company.Rabeea.PL.Controllers
             if (ModelState.IsValid) // Server Side Validation
             {
                 var dept = _mapper.Map<Department>(department);
-                var count = _departmentRepository.Add(dept);
+                _unitOfWork.DepartmentRepository.Add(dept);
+                var count = _unitOfWork.Complete();
                 if(count > 0)
                 {
                     return RedirectToAction("Index");
@@ -50,7 +49,7 @@ namespace Company.Rabeea.PL.Controllers
         public IActionResult Details(int? id, string viewName = "Details")
         {
             if (id is null) return BadRequest();
-            var dept = _departmentRepository.Get(id.Value);
+            var dept = _unitOfWork.DepartmentRepository.Get(id.Value);
             if(dept is null)
             {
                 return NotFound();
@@ -61,7 +60,7 @@ namespace Company.Rabeea.PL.Controllers
         public IActionResult Edit(int? id)
         {
             if (id is null) return BadRequest();
-            var dept = _departmentRepository.Get(id.Value);
+            var dept = _unitOfWork.DepartmentRepository.Get(id.Value);
             if (dept is null)
             {
                 return NotFound();
@@ -78,7 +77,8 @@ namespace Company.Rabeea.PL.Controllers
                 var dept = _mapper.Map<Department>(department);
                 dept.Id = id;
                 if (id != dept.Id) return BadRequest();
-                var count = _departmentRepository.Update(dept);
+                _unitOfWork.DepartmentRepository.Update(dept);
+                var count = _unitOfWork.Complete();
                 if (count > 0) return RedirectToAction("Index");
             }
             
@@ -87,12 +87,13 @@ namespace Company.Rabeea.PL.Controllers
         public IActionResult Delete(int? id)
         {
             if (id is null) return BadRequest();
-            var dept = _departmentRepository.Get(id.Value);
+            var dept = _unitOfWork.DepartmentRepository.Get(id.Value);
             if (dept is null)
             {
                 return NotFound();
             }
-            _departmentRepository.Delete(dept);
+            _unitOfWork.DepartmentRepository.Delete(dept);
+            _unitOfWork.Complete();
             return RedirectToAction(nameof(Index));
 
         }
