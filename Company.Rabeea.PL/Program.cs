@@ -2,6 +2,8 @@ using Company.Rabeea.BLL.Interfaces;
 using Company.Rabeea.BLL.Repositories;
 using Company.Rabeea.DAL.Data.Contexts;
 using Company.Rabeea.DAL.Models;
+using Company.Rabeea.PL.Mapping;
+using Company.Rabeea.PL.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace Company.Rabeea.PL
@@ -20,6 +22,17 @@ namespace Company.Rabeea.PL
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("Default"));
             }); // Allows DI for DbContext
+            builder.Services.AddScoped<IScopedService, ScopedService>(); // per request
+            builder.Services.AddScoped<ITransientService, TransientService>(); // per operation
+            builder.Services.AddScoped<ISingletonService, SingletonService>(); // per application
+            builder.Services.AddAutoMapper(m => m.AddProfile(new EmployeeProfile()));
+            builder.Services.AddAutoMapper(m => m.AddProfile(new DepartmentProfile()));
+            // Dependency Injection: Allow clr to create objects of this class instead of the class itself handles it
+            // Services LifeTimes
+
+            //builder.Services.AddScoped(); // create object life time per request - Unreachable object after the request -- best for repositories
+            //builder.Services.AddTransient(); // create object life time per operation - every use creates an object
+            //builder.Services.AddSingleton(); // create object life time per app
 
             var app = builder.Build();
 

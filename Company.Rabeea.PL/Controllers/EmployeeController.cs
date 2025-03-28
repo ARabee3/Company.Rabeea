@@ -1,4 +1,5 @@
-﻿using Company.Rabeea.BLL.Interfaces;
+﻿using AutoMapper;
+using Company.Rabeea.BLL.Interfaces;
 using Company.Rabeea.DAL.Models;
 using Company.Rabeea.PL.Dto;
 using Microsoft.AspNetCore.Mvc;
@@ -9,11 +10,13 @@ namespace Company.Rabeea.PL.Controllers
     {
         private readonly IEmployeeRepository _employeeRepository;
         private readonly IDepartmentRepository _departmentRepository;
+        private readonly IMapper _mapper;
 
-        public EmployeeController(IEmployeeRepository employeeRepository, IDepartmentRepository departmentRepository)
+        public EmployeeController(IEmployeeRepository employeeRepository, IDepartmentRepository departmentRepository, IMapper mapper)
         {
             this._employeeRepository = employeeRepository;
             this._departmentRepository = departmentRepository;
+            this._mapper = mapper;
         }
         [HttpGet]
         public IActionResult Index(string SearchInput)
@@ -42,19 +45,7 @@ namespace Company.Rabeea.PL.Controllers
 
             if (ModelState.IsValid)
             {
-                var emp = new Employee()
-                {
-                    Name = employee.Name,
-                    Address = employee.Address,
-                    Age = employee.Age,
-                    Email = employee.Email,
-                    CreateAt = employee.CreateAt,
-                    HiringDate = employee.HiringDate,
-                    IsActive = true,
-                    Phone = employee.Phone,
-                    Salary = employee.Salary,
-                    DepartmentId = employee.DepartmentId
-                };
+                var emp = _mapper.Map<Employee>(employee);
                 var count = _employeeRepository.Add(emp);
                 if (count > 0)
                 {
@@ -89,19 +80,7 @@ namespace Company.Rabeea.PL.Controllers
             {
                 return NotFound();
             }
-            var emp = new CreateEmployeeDto()
-            {
-                Name = employee.Name,
-                Address = employee.Address,
-                Age = employee.Age,
-                Email = employee.Email,
-                CreateAt = employee.CreateAt,
-                HiringDate = employee.HiringDate,
-                IsActive = true,
-                Phone = employee.Phone,
-                Salary = employee.Salary,
-                DepartmentId = employee.DepartmentId
-            };
+            var emp = _mapper.Map<CreateEmployeeDto>(employee);
             return View(emp);
         }
 
@@ -112,20 +91,8 @@ namespace Company.Rabeea.PL.Controllers
             ViewData["departments"] = departments;
             if (ModelState.IsValid)
             {
-                var emp = new Employee()
-                {
-                    Id = id,
-                    Name = employee.Name,
-                    Address = employee.Address,
-                    Age = employee.Age,
-                    Email = employee.Email,
-                    CreateAt = employee.CreateAt,
-                    HiringDate = employee.HiringDate,
-                    IsActive = true,
-                    Phone = employee.Phone,
-                    Salary = employee.Salary,
-                    DepartmentId = employee.DepartmentId
-                };
+                var emp = _mapper.Map <Employee>(employee);
+                emp.Id = id;
                 if (id != emp.Id) return BadRequest();
                 var count = _employeeRepository.Update(emp);
                 if (count > 0) return RedirectToAction(nameof(Index));

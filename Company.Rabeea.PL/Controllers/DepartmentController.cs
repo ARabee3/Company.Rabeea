@@ -1,4 +1,5 @@
-﻿using Company.Rabeea.BLL.Interfaces;
+﻿using AutoMapper;
+using Company.Rabeea.BLL.Interfaces;
 using Company.Rabeea.BLL.Repositories;
 using Company.Rabeea.DAL.Models;
 using Company.Rabeea.PL.Dto;
@@ -10,9 +11,15 @@ namespace Company.Rabeea.PL.Controllers
     {
         // Ask CLR To Create Object of DepartmentRepository
         private readonly IDepartmentRepository _departmentRepository;
-        public DepartmentController(IDepartmentRepository departmentRepository)
+        private readonly IMapper _mapper;
+
+        public DepartmentController(
+            IDepartmentRepository departmentRepository,
+            IMapper mapper
+            )
         {
             _departmentRepository = departmentRepository;
+            this._mapper = mapper;
         }
         public IActionResult Index()
         {
@@ -27,14 +34,9 @@ namespace Company.Rabeea.PL.Controllers
         [HttpPost]
         public IActionResult Create(CreateDepartmentDto department)
         {
-            if (ModelState.IsValid) // Server Side Validaton
+            if (ModelState.IsValid) // Server Side Validation
             {
-                var dept = new Department
-                {
-                    Code = department.Code,
-                    Name = department.Name,
-                    CreateAt = department.CreateAt
-                };
+                var dept = _mapper.Map<Department>(department);
                 var count = _departmentRepository.Add(dept);
                 if(count > 0)
                 {
@@ -64,27 +66,17 @@ namespace Company.Rabeea.PL.Controllers
             {
                 return NotFound();
             }
-            var department = new CreateDepartmentDto
-            {
-                Code = dept.Code,
-                Name = dept.Name,
-                CreateAt = dept.CreateAt
-            };
+            var department = _mapper.Map<CreateDepartmentDto>(dept);
             return View(department);
         }
         [HttpPost]
-        //[ValidateAntiForgeryToken] allows only the app to use the POST Endpoint
+        [ValidateAntiForgeryToken] 
         public IActionResult Edit([FromRoute]int id,CreateDepartmentDto department)
         { 
             if (ModelState.IsValid)
             {
-                var dept = new Department()
-                {
-                    Id = id,
-                    Code = department.Code,
-                    Name = department.Name,
-                    CreateAt = department.CreateAt
-                };
+                var dept = _mapper.Map<Department>(department);
+                dept.Id = id;
                 if (id != dept.Id) return BadRequest();
                 var count = _departmentRepository.Update(dept);
                 if (count > 0) return RedirectToAction("Index");
