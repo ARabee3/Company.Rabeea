@@ -3,6 +3,7 @@ using AutoMapper;
 using Company.Rabeea.BLL.Interfaces;
 using Company.Rabeea.DAL.Models;
 using Company.Rabeea.PL.Dto;
+using Company.Rabeea.PL.Helpers;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Company.Rabeea.PL.Controllers
@@ -41,9 +42,9 @@ namespace Company.Rabeea.PL.Controllers
         [HttpPost]
         public IActionResult Create(CreateEmployeeDto employee)
         {
-
             if (ModelState.IsValid)
             {
+                if (employee.Image is not null) employee.ImageName = AttachmentSettings.UploadFile(employee.Image, "images");
                 var emp = _mapper.Map<Employee>(employee);
                 _unitOfWork.EmployeeRepository.Add(emp);
                 var count = _unitOfWork.Complete();
@@ -87,6 +88,15 @@ namespace Company.Rabeea.PL.Controllers
         [HttpPost]
         public IActionResult Edit([FromRoute] int id, CreateEmployeeDto employee)
         {
+            if(employee.ImageName is not null && employee.Image is not null)
+            {
+                AttachmentSettings.DeleteFile(employee.ImageName , "images");
+            }
+            if(employee.Image is not null)
+            {
+                employee.ImageName = AttachmentSettings.UploadFile(employee.Image , "images");
+            }
+
             var departments = _unitOfWork.DepartmentRepository.GetAll();
             ViewData["departments"] = departments;
             if (ModelState.IsValid)
@@ -111,7 +121,15 @@ namespace Company.Rabeea.PL.Controllers
             }
             emp.IsDeleted = true;
             _unitOfWork.EmployeeRepository.Update(emp);
-            _unitOfWork.Complete();
+            var count = _unitOfWork.Complete();
+            if (count > 0)
+            {
+                if(emp.ImageName is not null)
+                {
+                    AttachmentSettings.DeleteFile(emp.ImageName, "images");
+                    emp.ImageName = null;
+                }
+            }
             return RedirectToAction(nameof(Index));
             // Soft Delete
         }

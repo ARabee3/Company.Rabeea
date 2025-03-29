@@ -44,4 +44,6 @@ public class CreateEmployeeDto
 
     [DisplayName("Department")]
     public int? DepartmentId { get; set; }
+    public string? ImageName { get; set; }
+    public IFormFile? Image { get; set; }
 }
