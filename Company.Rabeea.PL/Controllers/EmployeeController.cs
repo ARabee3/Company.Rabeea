@@ -5,6 +5,7 @@ using Company.Rabeea.DAL.Models;
 using Company.Rabeea.PL.Dto;
 using Company.Rabeea.PL.Helpers;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace Company.Rabeea.PL.Controllers
 {
@@ -19,35 +20,35 @@ namespace Company.Rabeea.PL.Controllers
             _mapper = mapper;
         }
         [HttpGet]
-        public IActionResult Index(string SearchInput)
+        public async Task<IActionResult> Index(string SearchInput)
         {
             IEnumerable<Employee> employees;
             if(SearchInput is not null)
             {
-                employees = _unitOfWork.EmployeeRepository.GetByName(SearchInput);
+                employees = await _unitOfWork.EmployeeRepository.GetByNameAsync(SearchInput);
             }
             else
             {
-                employees = _unitOfWork.EmployeeRepository.GetAll();
+                employees = await _unitOfWork.EmployeeRepository.GetAllAsync();
             }
             return View(employees);
         }
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            var departments = _unitOfWork.DepartmentRepository.GetAll();
+            var departments = await _unitOfWork.DepartmentRepository.GetAllAsync();
             ViewData["departments"] = departments;
             return View();
         }
         [HttpPost]
-        public IActionResult Create(CreateEmployeeDto employee)
+        public async Task<IActionResult> Create(CreateEmployeeDto employee)
         {
             if (ModelState.IsValid)
             {
                 if (employee.Image is not null) employee.ImageName = AttachmentSettings.UploadFile(employee.Image, "images");
                 var emp = _mapper.Map<Employee>(employee);
-                _unitOfWork.EmployeeRepository.Add(emp);
-                var count = _unitOfWork.Complete();
+                await _unitOfWork.EmployeeRepository.AddAsync(emp);
+                var count = await _unitOfWork.CompleteAsync();
                 if (count > 0)
                 {
                     TempData["Message"] = "Employee Created Successfully";
@@ -59,10 +60,10 @@ namespace Company.Rabeea.PL.Controllers
         }
 
         [HttpGet]
-        public IActionResult Details(int? id, string viewName = "Details")
+        public async Task<IActionResult> Details(int? id, string viewName = "Details")
         {
             if (id is null) return BadRequest();
-            var dept = _unitOfWork.EmployeeRepository.Get(id.Value);
+            var dept = await _unitOfWork.EmployeeRepository.GetAsync(id.Value);
             if (dept is null)
             {
                 return NotFound();
@@ -71,12 +72,12 @@ namespace Company.Rabeea.PL.Controllers
         }
 
         [HttpGet]
-        public IActionResult Edit(int? id)
+        public async Task<IActionResult> Edit(int? id)
         {
-            var departments = _unitOfWork.DepartmentRepository.GetAll();
+            var departments = await _unitOfWork.DepartmentRepository.GetAllAsync();
             ViewData["departments"] = departments;
             if (id is null) return BadRequest();
-            var employee = _unitOfWork.EmployeeRepository.Get(id.Value);
+            var employee = await _unitOfWork.EmployeeRepository.GetAsync(id.Value);
             if (employee is null)
             {
                 return NotFound();
@@ -86,7 +87,7 @@ namespace Company.Rabeea.PL.Controllers
         }
 
         [HttpPost]
-        public IActionResult Edit([FromRoute] int id, CreateEmployeeDto employee)
+        public async Task<IActionResult> Edit([FromRoute] int id, CreateEmployeeDto employee)
         {
             if(employee.ImageName is not null && employee.Image is not null)
             {
@@ -97,7 +98,7 @@ namespace Company.Rabeea.PL.Controllers
                 employee.ImageName = AttachmentSettings.UploadFile(employee.Image , "images");
             }
 
-            var departments = _unitOfWork.DepartmentRepository.GetAll();
+            var departments = await _unitOfWork.DepartmentRepository.GetAllAsync();
             ViewData["departments"] = departments;
             if (ModelState.IsValid)
             {
@@ -105,23 +106,23 @@ namespace Company.Rabeea.PL.Controllers
                 emp.Id = id;
                 if (id != emp.Id) return BadRequest();
                 _unitOfWork.EmployeeRepository.Update(emp);
-                var count = _unitOfWork.Complete();
+                var count = await _unitOfWork.CompleteAsync();
                 if (count > 0) return RedirectToAction(nameof(Index));
             }
             return View(employee);
         }
 
-        public IActionResult Delete(int? id)
+        public async Task<IActionResult> Delete(int? id)
         {
             if (id is null) return BadRequest();
-            var emp = _unitOfWork.EmployeeRepository.Get(id.Value);
+            var emp = await _unitOfWork.EmployeeRepository.GetAsync(id.Value);
             if (emp is null)
             {
                 return NotFound();
             }
             emp.IsDeleted = true;
             _unitOfWork.EmployeeRepository.Update(emp);
-            var count = _unitOfWork.Complete();
+            var count = await _unitOfWork.CompleteAsync();
             if (count > 0)
             {
                 if(emp.ImageName is not null)

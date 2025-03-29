@@ -1,6 +1,7 @@
 ﻿using Company.Rabeea.BLL.Interfaces;
 using Company.Rabeea.DAL.Data.Contexts;
 using Company.Rabeea.DAL.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Company.Rabeea.BLL.Repositories
 {
@@ -14,9 +15,9 @@ namespace Company.Rabeea.BLL.Repositories
             this._context = context;
         }
 
-        public IEnumerable<Employee> GetByName(string input)
+        public async Task<IEnumerable<Employee>> GetByNameAsync(string input)
         {
-            return _context.Employees.Where(E => E.Name.ToLower().Contains(input.ToLower()));
+            return await _context.Employees.Where(E => E.Name.ToLower().Contains(input.ToLower())).ToListAsync();
         }
         
 

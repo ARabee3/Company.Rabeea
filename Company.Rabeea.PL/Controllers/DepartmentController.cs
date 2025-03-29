@@ -4,6 +4,7 @@ using Company.Rabeea.BLL.Repositories;
 using Company.Rabeea.DAL.Models;
 using Company.Rabeea.PL.Dto;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 namespace Company.Rabeea.PL.Controllers
 {
     public class DepartmentController : Controller
@@ -19,9 +20,9 @@ namespace Company.Rabeea.PL.Controllers
             _mapper = mapper;
             _unitOfWork = unitOfWork;
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var departments = _unitOfWork.DepartmentRepository.GetAll();
+            var departments = await _unitOfWork.DepartmentRepository.GetAllAsync();
             return View(departments);
         }
         [HttpGet]
@@ -30,13 +31,13 @@ namespace Company.Rabeea.PL.Controllers
             return View();
         }
         [HttpPost]
-        public IActionResult Create(CreateDepartmentDto department)
+        public async Task<IActionResult> Create(CreateDepartmentDto department)
         {
             if (ModelState.IsValid) // Server Side Validation
             {
                 var dept = _mapper.Map<Department>(department);
-                _unitOfWork.DepartmentRepository.Add(dept);
-                var count = _unitOfWork.Complete();
+                await _unitOfWork.DepartmentRepository.AddAsync(dept);
+                var count = await _unitOfWork.CompleteAsync();
                 if(count > 0)
                 {
                     return RedirectToAction("Index");
@@ -46,10 +47,10 @@ namespace Company.Rabeea.PL.Controllers
         }
 
         [HttpGet]
-        public IActionResult Details(int? id, string viewName = "Details")
+        public async Task<IActionResult> Details(int? id, string viewName = "Details")
         {
             if (id is null) return BadRequest();
-            var dept = _unitOfWork.DepartmentRepository.Get(id.Value);
+            var dept = await _unitOfWork.DepartmentRepository.GetAsync(id.Value);
             if(dept is null)
             {
                 return NotFound();
@@ -57,10 +58,10 @@ namespace Company.Rabeea.PL.Controllers
             return View(viewName,dept);
         }
         [HttpGet]
-        public IActionResult Edit(int? id)
+        public async Task<IActionResult> Edit(int? id)
         {
             if (id is null) return BadRequest();
-            var dept = _unitOfWork.DepartmentRepository.Get(id.Value);
+            var dept = await _unitOfWork.DepartmentRepository.GetAsync(id.Value);
             if (dept is null)
             {
                 return NotFound();
@@ -70,7 +71,7 @@ namespace Company.Rabeea.PL.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken] 
-        public IActionResult Edit([FromRoute]int id,CreateDepartmentDto department)
+        public async Task<IActionResult> Edit([FromRoute]int id,CreateDepartmentDto department)
         { 
             if (ModelState.IsValid)
             {
@@ -78,22 +79,22 @@ namespace Company.Rabeea.PL.Controllers
                 dept.Id = id;
                 if (id != dept.Id) return BadRequest();
                 _unitOfWork.DepartmentRepository.Update(dept);
-                var count = _unitOfWork.Complete();
+                var count = await _unitOfWork.CompleteAsync();
                 if (count > 0) return RedirectToAction("Index");
             }
             
             return View(department);
         }
-        public IActionResult Delete(int? id)
+        public async Task<IActionResult> Delete(int? id)
         {
             if (id is null) return BadRequest();
-            var dept = _unitOfWork.DepartmentRepository.Get(id.Value);
+            var dept = await _unitOfWork.DepartmentRepository.GetAsync(id.Value);
             if (dept is null)
             {
                 return NotFound();
             }
             _unitOfWork.DepartmentRepository.Delete(dept);
-            _unitOfWork.Complete();
+            await _unitOfWork.CompleteAsync();
             return RedirectToAction(nameof(Index));
 
         }
