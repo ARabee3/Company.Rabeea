@@ -1,6 +1,8 @@
 ﻿using Company.Rabeea.BLL.Interfaces;
 using Company.Rabeea.DAL.Data.Contexts;
+using System.Runtime.InteropServices;
 using System.Threading.Channels;
+using System.Threading.Tasks;
 
 namespace Company.Rabeea.BLL.Repositories
 {
@@ -15,14 +17,14 @@ namespace Company.Rabeea.BLL.Repositories
         }
         public IDepartmentRepository DepartmentRepository { get; }
         public IEmployeeRepository EmployeeRepository { get; }
-        public int Complete()
+        public async Task<int> CompleteAsync()
         {
-            return _context.SaveChanges();
+            return await _context.SaveChangesAsync();
         }
 
-        public void Dispose()
+        public async ValueTask DisposeAsync()
         {
-            _context.Dispose();
+            await _context.DisposeAsync();
         }
     }
 }
