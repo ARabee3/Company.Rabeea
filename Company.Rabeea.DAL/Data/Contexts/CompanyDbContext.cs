@@ -1,10 +1,11 @@
 ﻿using Company.Rabeea.DAL.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
 namespace Company.Rabeea.DAL.Data.Contexts
 {
-    public class CompanyDbContext : DbContext
+    public class CompanyDbContext : IdentityDbContext<AppUser>
     {
         public CompanyDbContext(DbContextOptions options) : base(options)
         {
@@ -22,5 +23,7 @@ namespace Company.Rabeea.DAL.Data.Contexts
         //}
         public DbSet<Department> Departments { get; set; }
         public DbSet<Employee> Employees { get; set; }
+      
+
     }
 }
