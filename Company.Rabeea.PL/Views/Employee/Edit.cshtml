@@ -6,8 +6,9 @@
 <h1>Edit Employee @Model.Name</h1>
 <br />
 <br />
-<form asp-action="Edit">
+<form asp-action="Edit" enctype="multipart/form-data">
     <partial name="EmployeePartialViews/_CreateEditPartialView" />
+    <input asp-for="ImageName" hidden />
 </form>
 
 @section ValidationSection {
