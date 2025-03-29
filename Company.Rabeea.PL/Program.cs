@@ -4,6 +4,7 @@ using Company.Rabeea.DAL.Data.Contexts;
 using Company.Rabeea.DAL.Models;
 using Company.Rabeea.PL.Mapping;
 using Company.Rabeea.PL.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Company.Rabeea.PL
@@ -29,6 +30,12 @@ namespace Company.Rabeea.PL
             builder.Services.AddScoped<ISingletonService, SingletonService>(); // per application
             builder.Services.AddAutoMapper(m => m.AddProfile(new EmployeeProfile()));
             builder.Services.AddAutoMapper(m => m.AddProfile(new DepartmentProfile()));
+            builder.Services.AddIdentity<AppUser, IdentityRole>()
+                            .AddEntityFrameworkStores<CompanyDbContext>();
+            builder.Services.ConfigureApplicationCookie(
+                config => 
+                config.LoginPath = "/Account/SignIn"
+                );
             // Dependency Injection: Allow clr to create objects of this class instead of the class itself handles it
             // Services LifeTimes
 
@@ -50,7 +57,7 @@ namespace Company.Rabeea.PL
             app.UseStaticFiles();
 
             app.UseRouting();
-
+            app.UseAuthentication(); 
             app.UseAuthorization();
 
             app.MapControllerRoute(

@@ -4,11 +4,13 @@ using Company.Rabeea.BLL.Interfaces;
 using Company.Rabeea.DAL.Models;
 using Company.Rabeea.PL.Dto;
 using Company.Rabeea.PL.Helpers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
 namespace Company.Rabeea.PL.Controllers
 {
+    [Authorize]
     public class EmployeeController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;

@@ -3,10 +3,12 @@ using Company.Rabeea.BLL.Interfaces;
 using Company.Rabeea.BLL.Repositories;
 using Company.Rabeea.DAL.Models;
 using Company.Rabeea.PL.Dto;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 namespace Company.Rabeea.PL.Controllers
 {
+    [Authorize]
     public class DepartmentController : Controller
     {
         // Ask CLR To Create Object of DepartmentRepository

@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 using Company.Rabeea.PL.Models;
 using Company.Rabeea.PL.Services;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Company.Rabeea.PL.Controllers;
 
+[Authorize]
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
