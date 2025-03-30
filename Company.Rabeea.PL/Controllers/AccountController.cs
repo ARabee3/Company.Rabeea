@@ -1,7 +1,9 @@
 ﻿using Company.Rabeea.DAL.Models;
 using Company.Rabeea.PL.Dto;
+using Company.Rabeea.PL.Helpers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Identity.Client;
 using System.Threading.Tasks;
 
 namespace Company.Rabeea.PL.Controllers
@@ -69,7 +71,7 @@ namespace Company.Rabeea.PL.Controllers
             if (ModelState.IsValid)
             {
                 var user = await _userManager.FindByEmailAsync(model.Email);
-                if(user is not null)
+                if (user is not null)
                 {
                     var flag = await _userManager.CheckPasswordAsync(user, model.Password);
                     if (flag)
@@ -90,6 +92,73 @@ namespace Company.Rabeea.PL.Controllers
         {
             await _signInManager.SignOutAsync();
             return RedirectToAction(nameof(SignIn));
+        }
+        [HttpGet]
+        public IActionResult ForgetPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SendResetPasswordUrl(ForgetPasswordDto model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                if (user is not null)
+                {
+                    var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                    var url = Url.Action("ResetPassword", "Account", new { email = model.Email, token }, Request.Scheme);
+                    var email = new Email
+                    {
+                        To = model.Email,
+                        Subject = "Password Reset",
+                        Body = url!
+                    };
+                    var flag = EmailSettings.SendEmail(email);
+                    if (flag)
+                    {
+                        return RedirectToAction("CheckYourInbox");
+
+                    }
+                }
+            }
+            ModelState.AddModelError("", "Invalid Data");
+            return View("ForgetPassword");
+        }
+        [HttpGet]
+        public IActionResult CheckYourInbox()
+        {
+            return View();
+        }
+        [HttpGet]
+        public IActionResult ResetPassword(string email, string token)
+        {
+            TempData["email"] = email;
+            TempData["token"] = token;
+            return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword(ResetPasswordDto model)
+        {
+            if (ModelState.IsValid)
+            {
+                var email = TempData["email"] as string;
+                var token = TempData["token"] as string;
+                if (email is null || token is null) return BadRequest("Invalid Operation");
+                var user = await _userManager.FindByEmailAsync(email);
+                if(user is not null)
+                {
+                   var result = await _userManager.ResetPasswordAsync(user, token, model.NewPassword);
+                    if (result.Succeeded)
+                    {
+                        TempData["SuccessMessage"] = "Successfully Reset Password";
+                        return RedirectToAction("SignIn");
+                    }
+                }
+                ModelState.AddModelError("", "Invalid Reset Password");
+            }
+            return View();
         }
     }
 }
