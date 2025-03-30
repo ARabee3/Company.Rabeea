@@ -31,7 +31,8 @@ namespace Company.Rabeea.PL
             builder.Services.AddAutoMapper(m => m.AddProfile(new EmployeeProfile()));
             builder.Services.AddAutoMapper(m => m.AddProfile(new DepartmentProfile()));
             builder.Services.AddIdentity<AppUser, IdentityRole>()
-                            .AddEntityFrameworkStores<CompanyDbContext>();
+                            .AddEntityFrameworkStores<CompanyDbContext>()
+                            .AddDefaultTokenProviders();
             builder.Services.ConfigureApplicationCookie(
                 config => 
                 config.LoginPath = "/Account/SignIn"
