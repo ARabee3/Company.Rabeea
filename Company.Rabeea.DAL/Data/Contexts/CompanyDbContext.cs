@@ -1,6 +1,7 @@
 ﻿using Company.Rabeea.DAL.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using System.Reflection;
 
 namespace Company.Rabeea.DAL.Data.Contexts
