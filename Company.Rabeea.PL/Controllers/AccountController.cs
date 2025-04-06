@@ -2,6 +2,9 @@
 using Company.Rabeea.PL.Authentication;
 using Company.Rabeea.PL.Dto;
 using Company.Rabeea.PL.Helpers;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Facebook;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -197,6 +200,49 @@ namespace Company.Rabeea.PL.Controllers
             return View();
         }
 
-
+        public IActionResult GoogleLogin()
+        {
+            var prop = new AuthenticationProperties()
+            {
+                RedirectUri = Url.Action("GoogleResponse")
+            };
+            return Challenge(prop, GoogleDefaults.AuthenticationScheme);
+        }
+        public async Task<IActionResult> GoogleResponse()
+        {
+            var result = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
+            var claims = result.Principal.Identities.FirstOrDefault().Claims.Select(
+                    claim => new
+                    {
+                        claim.Type,
+                        claim.Value,
+                        claim.Issuer,
+                        claim.OriginalIssuer
+                    }
+                );
+            return RedirectToAction("Index", "Home");
+        }
+        public IActionResult FacebookLogin()
+        {
+            var prop = new AuthenticationProperties()
+            {
+                RedirectUri = Url.Action("FacebookResponse")
+            };
+            return Challenge(prop, FacebookDefaults.AuthenticationScheme);
+        }
+        public async Task<IActionResult> FacebookResponse()
+        {
+            var result = await HttpContext.AuthenticateAsync(FacebookDefaults.AuthenticationScheme);
+            var claims = result.Principal.Identities.FirstOrDefault().Claims.Select(
+                    claim => new
+                    {
+                        claim.Type,
+                        claim.Value,
+                        claim.Issuer,
+                        claim.OriginalIssuer
+                    }
+                );
+            return RedirectToAction("Index", "Home");
+        }
     }
 }

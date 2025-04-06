@@ -5,6 +5,8 @@ using Company.Rabeea.DAL.Models;
 using Company.Rabeea.PL.Authentication;
 using Company.Rabeea.PL.Mapping;
 using Company.Rabeea.PL.Services;
+using Microsoft.AspNetCore.Authentication.Facebook;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -44,7 +46,31 @@ namespace Company.Rabeea.PL
 
             builder.Services.Configure<MailSettings>(builder.Configuration.GetSection(nameof(MailSettings)));
             builder.Services.Configure<TwilioSettings>(builder.Configuration.GetSection(nameof(TwilioSettings)));
+            builder.Services.AddAuthentication(o => {
+                o.DefaultAuthenticateScheme = GoogleDefaults.AuthenticationScheme;
+                o.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
 
+
+            }).AddGoogle(
+                    o=>
+                    {
+                        o.ClientId = builder.Configuration["Authentication:Google:ClientId"]!;
+                        o.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]!;
+                    }
+                ); 
+            
+            builder.Services.AddAuthentication(o => {
+                o.DefaultAuthenticateScheme = FacebookDefaults.AuthenticationScheme;
+                o.DefaultChallengeScheme = FacebookDefaults.AuthenticationScheme;
+
+
+            }).AddFacebook(
+                    o=>
+                    {
+                        o.ClientId = builder.Configuration["Authentication:Facebook:ClientId"]!;
+                        o.ClientSecret = builder.Configuration["Authentication:Facebook:ClientSecret"]!;
+                    }
+                );
             // Dependency Injection: Allow clr to create objects of this class instead of the class itself handles it
             // Services LifeTimes
 
