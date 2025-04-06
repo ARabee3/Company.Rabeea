@@ -4,8 +4,6 @@ using Company.Rabeea.PL.Dto;
 using Company.Rabeea.PL.Helpers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Identity.Client;
-using System.Threading.Tasks;
 
 namespace Company.Rabeea.PL.Controllers
 {
@@ -14,12 +12,14 @@ namespace Company.Rabeea.PL.Controllers
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
         private readonly IMailService _mailService;
+        private readonly ITwilioService _twilioService;
 
-        public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager,IMailService mailService)
+        public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager,IMailService mailService,ITwilioService twilioService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _mailService = mailService;
+            _twilioService = twilioService;
         }
         [HttpGet]
         public IActionResult SignUp()
@@ -127,8 +127,37 @@ namespace Company.Rabeea.PL.Controllers
             ModelState.AddModelError("", "Invalid Data");
             return View("ForgetPassword");
         }
+        [HttpPost]
+        public async Task<IActionResult> SendResetPasswordUrlSms(ForgetPasswordDto model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                if (user is not null)
+                {
+                    var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                    var url = Url.Action("ResetPassword", "Account", new { email = model.Email, token }, Request.Scheme);
+                    var sms = new Sms
+                    {
+                        To = user.PhoneNumber!,
+                        Body = url!
+                    };
+                    _twilioService.SendSms(sms);
+                    return RedirectToAction("CheckYourPhone");
+
+                    
+                }
+            }
+            ModelState.AddModelError("", "Invalid Data");
+            return View("ForgetPassword");
+        }
         [HttpGet]
         public IActionResult CheckYourInbox()
+        {
+            return View();
+        } 
+        [HttpGet]
+        public IActionResult CheckYourPhone()
         {
             return View();
         }
@@ -161,5 +190,7 @@ namespace Company.Rabeea.PL.Controllers
             }
             return View();
         }
+
+
     }
 }
