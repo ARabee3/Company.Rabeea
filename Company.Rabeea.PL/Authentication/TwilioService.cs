@@ -18,7 +18,7 @@ public class TwilioService(IOptions<TwilioSettings> options) : ITwilioService
         var message = MessageResource.Create(
             body: sms.Body,
             to: sms.To,
-            from: _options.PhoneNumber
+            from: new Twilio.Types.PhoneNumber(_options.PhoneNumber)
             );
         return message;
     }

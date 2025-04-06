@@ -30,6 +30,7 @@ namespace Company.Rabeea.PL
             builder.Services.AddScoped<ITransientService, TransientService>(); // per operation
             builder.Services.AddScoped<ISingletonService, SingletonService>(); // per application
             builder.Services.AddScoped<IMailService, MailService>();
+            builder.Services.AddScoped<ITwilioService, TwilioService>();
 
             builder.Services.AddAutoMapper(m => m.AddProfile(new EmployeeProfile()));
             builder.Services.AddAutoMapper(m => m.AddProfile(new DepartmentProfile()));
