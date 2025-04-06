@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authentication.Facebook;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace Company.Rabeea.PL
 {
@@ -42,33 +43,25 @@ namespace Company.Rabeea.PL
             builder.Services.ConfigureApplicationCookie(
                 config => {
                     config.LoginPath = "/Account/SignIn";
+                    config.LogoutPath = "/Account/Logout"; // Ensure this points to your logout action
+
                 });
 
             builder.Services.Configure<MailSettings>(builder.Configuration.GetSection(nameof(MailSettings)));
             builder.Services.Configure<TwilioSettings>(builder.Configuration.GetSection(nameof(TwilioSettings)));
-            builder.Services.AddAuthentication(o => {
-                o.DefaultAuthenticateScheme = GoogleDefaults.AuthenticationScheme;
-                o.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
-
-
-            }).AddGoogle(
+          
+            
+            builder.Services.AddAuthentication().AddFacebook(
                     o=>
+                    {
+                        o.AppId = builder.Configuration["Authentication:Facebook:ClientId"]!;
+                        o.AppSecret = builder.Configuration["Authentication:Facebook:ClientSecret"]!;
+                    }
+                ).AddGoogle(
+                    o =>
                     {
                         o.ClientId = builder.Configuration["Authentication:Google:ClientId"]!;
                         o.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]!;
-                    }
-                ); 
-            
-            builder.Services.AddAuthentication(o => {
-                o.DefaultAuthenticateScheme = FacebookDefaults.AuthenticationScheme;
-                o.DefaultChallengeScheme = FacebookDefaults.AuthenticationScheme;
-
-
-            }).AddFacebook(
-                    o=>
-                    {
-                        o.ClientId = builder.Configuration["Authentication:Facebook:ClientId"]!;
-                        o.ClientSecret = builder.Configuration["Authentication:Facebook:ClientSecret"]!;
                     }
                 );
             // Dependency Injection: Allow clr to create objects of this class instead of the class itself handles it
