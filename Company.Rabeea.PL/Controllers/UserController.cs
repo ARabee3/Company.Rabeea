@@ -1,12 +1,14 @@
 ﻿using Company.Rabeea.DAL.Models;
 using Company.Rabeea.PL.Dto;
 using Company.Rabeea.PL.Helpers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Runtime.InteropServices;
 
 namespace Company.Rabeea.PL.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class UserController(UserManager<AppUser> userManager) : Controller
     {
         private readonly UserManager<AppUser> _userManager = userManager;

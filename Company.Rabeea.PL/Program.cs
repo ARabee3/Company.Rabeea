@@ -38,9 +38,9 @@ namespace Company.Rabeea.PL
                             .AddEntityFrameworkStores<CompanyDbContext>()
                             .AddDefaultTokenProviders();
             builder.Services.ConfigureApplicationCookie(
-                config => 
-                config.LoginPath = "/Account/SignIn"
-                );
+                config => {
+                    config.LoginPath = "/Account/SignIn";
+                });
 
             builder.Services.Configure<MailSettings>(builder.Configuration.GetSection(nameof(MailSettings)));
             builder.Services.Configure<TwilioSettings>(builder.Configuration.GetSection(nameof(TwilioSettings)));
