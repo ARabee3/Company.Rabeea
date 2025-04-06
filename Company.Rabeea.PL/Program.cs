@@ -42,6 +42,7 @@ namespace Company.Rabeea.PL
                 );
 
             builder.Services.Configure<MailSettings>(builder.Configuration.GetSection(nameof(MailSettings)));
+            builder.Services.Configure<TwilioSettings>(builder.Configuration.GetSection(nameof(TwilioSettings)));
 
             // Dependency Injection: Allow clr to create objects of this class instead of the class itself handles it
             // Services LifeTimes
