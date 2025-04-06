@@ -1,4 +1,5 @@
 ﻿using Company.Rabeea.DAL.Models;
+using Company.Rabeea.PL.Authentication;
 using Company.Rabeea.PL.Dto;
 using Company.Rabeea.PL.Helpers;
 using Microsoft.AspNetCore.Identity;
@@ -12,11 +13,13 @@ namespace Company.Rabeea.PL.Controllers
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
+        private readonly IMailService _mailService;
 
-        public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager)
+        public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager,IMailService mailService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _mailService = mailService;
         }
         [HttpGet]
         public IActionResult SignUp()
@@ -115,12 +118,10 @@ namespace Company.Rabeea.PL.Controllers
                         Subject = "Password Reset",
                         Body = url!
                     };
-                    var flag = EmailSettings.SendEmail(email);
-                    if (flag)
-                    {
-                        return RedirectToAction("CheckYourInbox");
+                    _mailService.SendEmail(email);
+                    return RedirectToAction("CheckYourInbox");
 
-                    }
+                    
                 }
             }
             ModelState.AddModelError("", "Invalid Data");
