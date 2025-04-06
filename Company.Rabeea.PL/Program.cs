@@ -2,6 +2,7 @@ using Company.Rabeea.BLL.Interfaces;
 using Company.Rabeea.BLL.Repositories;
 using Company.Rabeea.DAL.Data.Contexts;
 using Company.Rabeea.DAL.Models;
+using Company.Rabeea.PL.Authentication;
 using Company.Rabeea.PL.Mapping;
 using Company.Rabeea.PL.Services;
 using Microsoft.AspNetCore.Identity;
@@ -28,6 +29,8 @@ namespace Company.Rabeea.PL
             builder.Services.AddScoped<IScopedService, ScopedService>(); // per request
             builder.Services.AddScoped<ITransientService, TransientService>(); // per operation
             builder.Services.AddScoped<ISingletonService, SingletonService>(); // per application
+            builder.Services.AddScoped<IMailService, MailService>();
+
             builder.Services.AddAutoMapper(m => m.AddProfile(new EmployeeProfile()));
             builder.Services.AddAutoMapper(m => m.AddProfile(new DepartmentProfile()));
             builder.Services.AddIdentity<AppUser, IdentityRole>()
@@ -37,6 +40,9 @@ namespace Company.Rabeea.PL
                 config => 
                 config.LoginPath = "/Account/SignIn"
                 );
+
+            builder.Services.Configure<MailSettings>(builder.Configuration.GetSection(nameof(MailSettings)));
+
             // Dependency Injection: Allow clr to create objects of this class instead of the class itself handles it
             // Services LifeTimes
 

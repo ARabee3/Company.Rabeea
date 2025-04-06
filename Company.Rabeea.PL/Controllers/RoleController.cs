@@ -6,9 +6,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Company.Rabeea.PL.Controllers
 {
-    public class RoleController(RoleManager<IdentityRole> roleManager) : Controller
+    public class RoleController(RoleManager<IdentityRole> roleManager, UserManager<AppUser> userManager) : Controller
     {
         private readonly RoleManager<IdentityRole> _roleManager = roleManager;
+        private readonly UserManager<AppUser> _userManager = userManager;
 
         [HttpGet]
         public async Task<IActionResult> Create()
@@ -95,7 +96,8 @@ namespace Company.Rabeea.PL.Controllers
                 {
                     role.Name = model.Name!;
                     var result = await _roleManager.UpdateAsync(role);
-                    if (result.Succeeded) RedirectToAction(nameof(Index));
+                    if (result.Succeeded) 
+                        return RedirectToAction(nameof(Index));
                 }
                 ModelState.AddModelError("", "Invalid Operations");
             }
@@ -109,6 +111,57 @@ namespace Company.Rabeea.PL.Controllers
             if (user is null) return BadRequest("Invalid Operations");
             var result = await _roleManager.DeleteAsync(user);
             return RedirectToAction(nameof(Index));
+        }
+        [HttpGet]
+        public async Task<IActionResult> AddOrRemoveUsers(string roleId)
+        {
+            if (string.IsNullOrEmpty(roleId)) return BadRequest();
+            var role = await _roleManager.FindByIdAsync(roleId);
+            if (role is null) return NotFound("No Role Found with this id");
+
+            ViewData["RoleId"] = roleId;
+            var usersInRole = new List<UserInRole>();
+            var users = _userManager.Users.ToList();
+            foreach(var user in users)
+            {
+                var userInRole = new UserInRole
+                {
+                    UserId = user.Id,
+                    UserName = user.UserName!
+                };
+                if (await _userManager.IsInRoleAsync(user, role.Name!)) userInRole.IsSelected = true;
+                else userInRole.IsSelected = false;
+                usersInRole.Add(userInRole);
+            }
+            return View(usersInRole);
+        }
+        
+        [HttpPost]
+        public async Task<IActionResult> AddOrRemoveUsers(string roleId, List<UserInRole> users)
+        {
+            var role = await _roleManager.FindByIdAsync(roleId);
+            if (role is null) return NotFound();
+
+            if (ModelState.IsValid)
+            {
+                foreach (var user in users)
+                {
+                    var appUser = await _userManager.FindByIdAsync(user.UserId);
+                    if (appUser is not null) {
+                        if (user.IsSelected && ! await _userManager.IsInRoleAsync(appUser,role.Name))
+                        {
+                             await _userManager.AddToRoleAsync(appUser, role.Name);
+                        }
+                        else if (! user.IsSelected && await _userManager.IsInRoleAsync(appUser, role.Name))
+                        {
+                            await _userManager.RemoveFromRoleAsync(appUser, role.Name);
+                        }
+                    } 
+                }
+                return RedirectToAction(nameof(Edit), new { id = roleId }); 
+            }
+            ModelState.AddModelError("", "Invalid Operation");
+            return View(users);
         }
     }
 }
