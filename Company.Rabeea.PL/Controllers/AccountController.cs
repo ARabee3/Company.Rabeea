@@ -101,6 +101,12 @@ namespace Company.Rabeea.PL.Controllers
         {
             return View();
         }
+        [HttpGet]
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
+
 
         [HttpPost]
         public async Task<IActionResult> SendResetPasswordUrl(ForgetPasswordDto model)
