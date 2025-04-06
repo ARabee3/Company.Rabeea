@@ -35,6 +35,14 @@ namespace Company.Rabeea.PL.Controllers
             }
             return View(employees);
         }
+
+        //public async Task<IActionResult> Search(string SearchInput)
+        //{
+        //    IEnumerable<Employee> employees;
+        //    employees = await _unitOfWork.EmployeeRepository.GetAllAsync();
+            
+        //    return PartialView("EmployeePartialViews/EmployeeSearchPartialView", employees);
+        //}
         [HttpGet]
         public async Task<IActionResult> Create()
         {
